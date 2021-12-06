@@ -7,8 +7,11 @@ import {
   Image,
   Text,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { format } from 'date-fns';
+import { Entypo } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import colors from '../constants/colors';
 import { ConversionInput } from '../components/ConversionInput';
@@ -23,7 +26,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.blue,
   },
   content: {
-    paddingTop: screen.height * 0.05,
+    paddingTop: screen.height * 0.1,
   },
   logoContainer: {
     alignItems: 'center',
@@ -54,13 +57,17 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginBottom: 10,
   },
+  header: {
+    alignItems: 'flex-end',
+    marginHorizontal: 20,
+  },
 });
 
-export default () => {
+export default ({ navigation }) => {
   const baseCurrency = 'USD';
   const quoteCurrency = 'GBP';
-  const conversionRate = 0.75;
-  const date = '2021-11-30';
+  const conversionRate = 0.89824;
+  const date = '2020-03-23';
 
   const [scrollEnabled, setScrollEnabled] = useState(false);
 
@@ -68,6 +75,12 @@ export default () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.blue} />
       <ScrollView scrollEnabled={scrollEnabled}>
+        <SafeAreaView style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.push('Options')}>
+            <Entypo name="cog" size={32} color={colors.white} />
+          </TouchableOpacity>
+        </SafeAreaView>
+
         <View style={styles.content}>
           <View style={styles.logoContainer}>
             <Image
@@ -86,7 +99,12 @@ export default () => {
             <ConversionInput
               text={baseCurrency}
               value="123"
-              onButtonPress={() => alert('todo!')}
+              onButtonPress={() =>
+                navigation.push('CurrencyList', {
+                  title: 'Base Currency',
+                  activeCurrency: baseCurrency,
+                })
+              }
               keyboardType="numeric"
               onChangeText={(text) => console.log('text', text)}
             />
@@ -94,7 +112,12 @@ export default () => {
               text={quoteCurrency}
               value="123"
               editable={false}
-              onButtonPress={() => alert('todo!')}
+              onButtonPress={() =>
+                navigation.push('CurrencyList', {
+                  title: 'Quote Currency',
+                  activeCurrency: quoteCurrency,
+                })
+              }
             />
           </View>
           <Text style={styles.text}>
