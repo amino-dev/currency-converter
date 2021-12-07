@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -8,17 +8,18 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-} from 'react-native';
-import { format } from 'date-fns';
-import { Entypo } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { format } from "date-fns";
+import { Entypo } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import colors from '../constants/colors';
-import { ConversionInput } from '../components/ConversionInput';
-import { Button } from '../components/Button';
-import { KeyboardSpacer } from '../components/KeyboardSpacer';
+import colors from "../constants/colors";
+import { ConversionInput } from "../components/ConversionInput";
+import { Button } from "../components/Button";
+import { KeyboardSpacer } from "../components/KeyboardSpacer";
+import { ConversionContext } from "../util/ConversionContext";
 
-const screen = Dimensions.get('window');
+const screen = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -29,8 +30,8 @@ const styles = StyleSheet.create({
     paddingTop: screen.height * 0.1,
   },
   logoContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
   },
   logoBackground: {
@@ -38,36 +39,51 @@ const styles = StyleSheet.create({
     height: screen.width * 0.45,
   },
   logo: {
-    position: 'absolute',
+    position: "absolute",
     width: screen.width * 0.25,
     height: screen.width * 0.25,
   },
   textHeader: {
     color: colors.white,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 30,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
   },
   text: {
     fontSize: 14,
     color: colors.white,
-    textAlign: 'center',
+    textAlign: "center",
   },
   inputContainer: {
     marginBottom: 10,
   },
   header: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     marginHorizontal: 20,
   },
 });
 
 export default ({ navigation }) => {
-  const baseCurrency = 'USD';
-  const quoteCurrency = 'GBP';
-  const conversionRate = 0.89824;
-  const date = '2020-03-23';
+  //let baseCurrency = 'USD';
+  //const [baseCurrency, setBaseCurrency] = useState("USD");
+  //let quoteCurrency = 'GBP';
+  // const [quoteCurrency, setQuoteCurrency] = useState("GBP");
+  const [value, setValue] = useState("100");
+  const conversionRate = 0.75;
+  const date = new Date();
+  const {
+    baseCurrency,
+    quoteCurrency,
+    swapCurrencies,
+  } = useContext(ConversionContext);
+  //console.log(conversionContextValue);
+  //const swapCurrencies = () => {
+  //baseCurrency = quoteCurrency;
+  //quoteCurrency = baseCurrency;
+  //setBaseCurrency(quoteCurrency);
+  //setQuoteCurrency(baseCurrency);
+  //};
 
   const [scrollEnabled, setScrollEnabled] = useState(false);
 
@@ -76,7 +92,7 @@ export default ({ navigation }) => {
       <StatusBar barStyle="light-content" backgroundColor={colors.blue} />
       <ScrollView scrollEnabled={scrollEnabled}>
         <SafeAreaView style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.push('Options')}>
+          <TouchableOpacity onPress={() => navigation.push("Options")}>
             <Entypo name="cog" size={32} color={colors.white} />
           </TouchableOpacity>
         </SafeAreaView>
@@ -84,12 +100,12 @@ export default ({ navigation }) => {
         <View style={styles.content}>
           <View style={styles.logoContainer}>
             <Image
-              source={require('../assets/images/background.png')}
+              source={require("../assets/images/background.png")}
               style={styles.logoBackground}
               resizeMode="contain"
             />
             <Image
-              source={require('../assets/images/logo.png')}
+              source={require("../assets/images/logo.png")}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -98,24 +114,30 @@ export default ({ navigation }) => {
           <View style={styles.inputContainer}>
             <ConversionInput
               text={baseCurrency}
-              value="123"
+              value={value}
               onButtonPress={() =>
-                navigation.push('CurrencyList', {
-                  title: 'Base Currency',
+                navigation.push("CurrencyList", {
+                  title: "Base Currency",
                   activeCurrency: baseCurrency,
+                  //onChange: (currency) => setBaseCurrency(currency),
+                  isBaseCurrency: true,
                 })
               }
               keyboardType="numeric"
-              onChangeText={(text) => console.log('text', text)}
+              onChangeText={(text) => setValue(text)}
             />
             <ConversionInput
               text={quoteCurrency}
-              value="123"
+              value={
+                value && `${(parseFloat(value) * conversionRate).toFixed(2)}`
+              }
               editable={false}
               onButtonPress={() =>
-                navigation.push('CurrencyList', {
-                  title: 'Quote Currency',
+                navigation.push("CurrencyList", {
+                  title: "Quote Currency",
                   activeCurrency: quoteCurrency,
+                  //onChange: (currency) => setQuoteCurrency(currency),
+                  isBaseCurrency: false,
                 })
               }
             />
@@ -123,10 +145,10 @@ export default ({ navigation }) => {
           <Text style={styles.text}>
             {`1 ${baseCurrency} = ${conversionRate} ${quoteCurrency} as of ${format(
               new Date(date),
-              'MMM do, yyyy'
+              "MMM do, yyyy"
             )}`}
           </Text>
-          <Button text="Reverse Currencies" onPress={() => alert('todo!')} />
+          <Button text="Reverse Currencies" onPress={() => swapCurrencies()} />
           <KeyboardSpacer onToggle={(visible) => setScrollEnabled(visible)} />
         </View>
       </ScrollView>
