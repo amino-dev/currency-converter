@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { StatusBar, FlatList, View, StyleSheet } from 'react-native';
-import { useSafeArea } from 'react-native-safe-area-context';
+import { useSafeAreaFrame } from 'react-native-safe-area-context';
 import { Entypo } from '@expo/vector-icons';
 
 import currencies from '../data/currencies.json';
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 });
 
 export default ({ navigation, route = {} }) => {
-  const insets = useSafeArea();
+  const insets = useSafeAreaFrame();
   const {
     baseCurrency,
     quoteCurrency,
